@@ -3,6 +3,9 @@ package com.yedam.app;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -17,7 +20,7 @@ class Boot01ApplicationTests {
 	@Autowired  //필드 주입 => 단순 테스트용
 	private EmpMapper empMapper;
 	
-	@Test
+	//@Test
 	void selectTest() {
 		List<EmpVO> list = empMapper.selectEmpList();
 		for(EmpVO emp : list) {
@@ -26,7 +29,7 @@ class Boot01ApplicationTests {
 		assertTrue(!list.isEmpty());
 	}
 
-	@Test
+	//@Test
 	void infoTest() {
 		EmpVO empVO = new EmpVO();
 		empVO.setEmployeeId(100);
@@ -39,15 +42,56 @@ class Boot01ApplicationTests {
 		// => 두 개가 같으면 테스트 성공, 다르면 실패
 	}
 	
-	@Test
-	void insertTest() {
+	//@Test
+	void insertTest() throws ParseException {
 		EmpVO empVO = new EmpVO();
 		empVO.setLastName("Kang");
-		empVO.setEmail("Kang@daum.net");
+		empVO.setEmail("SIN@daum.net");
 		empVO.setJobId("SA_REP");
+		
+		SimpleDateFormat sdf
+			= new SimpleDateFormat("yyMMdd");
+		Date date = sdf.parse("240501");
+		
+		empVO.setHireDate(date);
+
 		
 		int result = empMapper.insertEmpInfo(empVO);
 		
+		assertEquals(1, result);
+	}
+	
+	//@Test
+	void updateTest() {
+		//1) 단건조회
+		EmpVO empVO = new EmpVO();
+		empVO.setEmployeeId(210);
+		
+		EmpVO findVO = empMapper.selectEmpInfo(empVO);
+		//2) 수정할 데이터
+		findVO.setLastName("Han");
+		findVO.setJobId(null);
+		
+		//3) 수정
+		int result = empMapper.updateEmpInfo(findVO);
+		
+		assertEquals(1, result);
+		}
+	
+	//@Test
+	void deleteTest() {
+		int result = empMapper.deleteEmpInfo(300);
+		assertEquals(1, result);
+	}
+	//@Test
+	void selectKeyTest() {
+		EmpVO empVO = new EmpVO();
+		empVO.setLastName("Hong");
+		empVO.setEmail("Hong@google.com");
+		empVO.setJobId("IT_PROG");
+		// employeeId : null => 아직 insert가 일어나기 전
+		int result = empMapper.insertEmpInfo(empVO);
+		System.out.println("===" + empVO.getEmployeeId());
 		assertEquals(1, result);
 	}
 }
